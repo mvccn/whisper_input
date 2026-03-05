@@ -1,0 +1,15 @@
+# Rust build artifacts
+/target/
+
+# macOS metadata
+.DS_Store
+
+# Editor / tooling
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment / local overrides
+.env
+.env.*
