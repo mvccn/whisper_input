@@ -54,18 +54,6 @@ impl WhisperEngine {
     /// # Errors
     /// Returns an error when decoding fails or the model state cannot be created.
     pub(crate) fn transcribe(&self, audio: &[f32]) -> Result<String> {
-        self.transcribe_with_prompt(audio, None)
-    }
-
-    /// Runs full transcription over 16kHz mono float samples with optional prompt bias.
-    ///
-    /// # Errors
-    /// Returns an error when decoding fails or the model state cannot be created.
-    pub(crate) fn transcribe_with_prompt(
-        &self,
-        audio: &[f32],
-        initial_prompt: Option<&str>,
-    ) -> Result<String> {
         if audio.is_empty() {
             bail!("cannot transcribe empty audio buffer");
         }
@@ -86,10 +74,6 @@ impl WhisperEngine {
         params.set_language(Some("en"));
         params.set_no_timestamps(true);
         params.set_single_segment(true);
-        if let Some(prompt) = initial_prompt.and_then(non_empty_trimmed) {
-            let sanitized_prompt = sanitize_initial_prompt(prompt);
-            params.set_initial_prompt(&sanitized_prompt);
-        }
 
         state
             .full(params, audio)
@@ -130,36 +114,13 @@ fn normalize_transcript(input: &str) -> String {
         .to_string()
 }
 
-/// Returns a trimmed string slice when the input is non-empty.
-fn non_empty_trimmed(input: &str) -> Option<&str> {
-    let trimmed = input.trim();
-    if trimmed.is_empty() {
-        return None;
-    }
-    Some(trimmed)
-}
-
-/// Replaces null bytes because whisper-rs prompt APIs require C-compatible strings.
-fn sanitize_initial_prompt(input: &str) -> String {
-    if !input.contains('\0') {
-        return input.to_string();
-    }
-    input.replace('\0', " ")
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{normalize_transcript, sanitize_initial_prompt};
+    use super::normalize_transcript;
 
     #[test]
     fn normalization_compacts_whitespace() {
         let input = "  hello\n   world   ";
         assert_eq!(normalize_transcript(input), "hello world");
-    }
-
-    #[test]
-    fn prompt_sanitization_removes_null_bytes() {
-        let input = "hello\0world";
-        assert_eq!(sanitize_initial_prompt(input), "hello world");
     }
 }

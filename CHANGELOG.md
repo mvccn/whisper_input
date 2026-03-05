@@ -2,15 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.3.7] - 2026-03-05
-
-### Added
-- Added an embeddable one-shot CLI mode via `--tool-transcribe-once` that records for a fixed duration and prints transcript output to stdout.
-- Added `--tool-initial-prompt` and `--tool-initial-prompt-file` so external apps can provide decoding context bias without using tray/hotkey mode.
-
-### Changed
-- Extended transcription pipeline with optional Whisper initial prompt support while keeping existing tray/hotkey behavior unchanged.
-
 ## [0.3.6] - 2026-03-05
 
 ### Added

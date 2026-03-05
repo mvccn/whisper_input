@@ -54,22 +54,6 @@ pub(crate) struct Cli {
     /// Do not auto-paste after transcription; copy to clipboard only.
     #[arg(long)]
     pub(crate) no_auto_paste: bool,
-
-    /// Run one non-interactive capture/transcribe pass and print transcript to stdout.
-    #[arg(long)]
-    pub(crate) tool_transcribe_once: bool,
-
-    /// Capture duration in seconds for `--tool-transcribe-once`.
-    #[arg(long, default_value_t = 6)]
-    pub(crate) tool_record_seconds: u64,
-
-    /// Inline initial prompt text for `--tool-transcribe-once`.
-    #[arg(long)]
-    pub(crate) tool_initial_prompt: Option<String>,
-
-    /// File containing initial prompt text for `--tool-transcribe-once`.
-    #[arg(long)]
-    pub(crate) tool_initial_prompt_file: Option<PathBuf>,
 }
 
 /// Runtime config resolved from CLI and environment.
@@ -101,9 +85,6 @@ impl Config {
         if cli.model_dir.as_os_str().is_empty() {
             bail!("--model-dir must not be empty");
         }
-        if cli.tool_transcribe_once && cli.tool_record_seconds == 0 {
-            bail!("--tool-record-seconds must be at least 1");
-        }
 
         let threads = normalize_threads(cli.threads)?;
 
@@ -118,47 +99,6 @@ impl Config {
             auto_paste: !cli.no_auto_paste,
         })
     }
-}
-
-impl Cli {
-    /// Resolves initial prompt text for one-shot tool mode from inline and file sources.
-    ///
-    /// # Errors
-    /// Returns an error when `tool_initial_prompt_file` cannot be read.
-    pub(crate) fn resolve_tool_initial_prompt(&self) -> Result<Option<String>> {
-        let mut parts = Vec::new();
-
-        if let Some(inline) = self
-            .tool_initial_prompt
-            .as_deref()
-            .and_then(non_empty_trimmed)
-        {
-            parts.push(inline.to_string());
-        }
-
-        if let Some(path) = self.tool_initial_prompt_file.as_deref() {
-            let file_prompt = std::fs::read_to_string(path)
-                .with_context(|| format!("failed to read prompt file {}", path.display()))?;
-            if let Some(text) = non_empty_trimmed(file_prompt.as_str()) {
-                parts.push(text.to_string());
-            }
-        }
-
-        if parts.is_empty() {
-            return Ok(None);
-        }
-
-        Ok(Some(parts.join("\n")))
-    }
-}
-
-/// Returns a trimmed string slice when the input is non-empty.
-fn non_empty_trimmed(input: &str) -> Option<&str> {
-    let trimmed = input.trim();
-    if trimmed.is_empty() {
-        return None;
-    }
-    Some(trimmed)
 }
 
 /// Resolves thread count with a robust default for local inference.
@@ -183,7 +123,6 @@ mod tests {
     use super::{Cli, Config, normalize_threads};
     use crate::model::ModelSize;
     use clap::Parser;
-    use std::fs;
 
     fn valid_cli() -> Cli {
         Cli::parse_from([
@@ -240,50 +179,5 @@ mod tests {
 
         assert!(!config.use_gpu);
         assert!(!config.flash_attn);
-    }
-
-    #[test]
-    fn from_cli_rejects_zero_tool_record_seconds_when_tool_mode() {
-        let cli = Cli::parse_from([
-            "whisper_input",
-            "--model-size",
-            "small",
-            "--model-dir",
-            "/tmp/whisper_models",
-            "--tool-transcribe-once",
-            "--tool-record-seconds",
-            "0",
-        ]);
-
-        let err = Config::from_cli(cli).expect_err("tool mode with zero seconds should fail");
-        assert!(err.to_string().contains("--tool-record-seconds"));
-    }
-
-    #[test]
-    fn resolve_tool_initial_prompt_combines_inline_and_file() {
-        let prompt_file = tempfile::NamedTempFile::new().expect("temp file should be created");
-        fs::write(prompt_file.path(), "beta gamma").expect("temp prompt file should be writable");
-
-        let cli = Cli::parse_from([
-            "whisper_input",
-            "--tool-initial-prompt",
-            "alpha",
-            "--tool-initial-prompt-file",
-            prompt_file.path().to_str().expect("utf8 temp path"),
-        ]);
-
-        let prompt = cli
-            .resolve_tool_initial_prompt()
-            .expect("prompt resolution should succeed");
-        assert_eq!(prompt, Some(String::from("alpha\nbeta gamma")));
-    }
-
-    #[test]
-    fn resolve_tool_initial_prompt_skips_empty_sources() {
-        let cli = Cli::parse_from(["whisper_input", "--tool-initial-prompt", "   "]);
-        let prompt = cli
-            .resolve_tool_initial_prompt()
-            .expect("prompt resolution should succeed");
-        assert_eq!(prompt, None);
     }
 }

@@ -7,7 +7,6 @@ mod hotkey;
 mod model;
 mod paste;
 mod sound;
-mod tool;
 mod transcribe;
 
 use anyhow::Result;
@@ -19,12 +18,7 @@ use tracing_subscriber::EnvFilter;
 fn main() -> Result<()> {
     init_logging();
     let cli = Cli::parse();
-    let config = Config::from_cli(cli.clone())?;
-
-    if cli.tool_transcribe_once {
-        return tool::run_transcribe_once(&config, &cli);
-    }
-
+    let config = Config::from_cli(cli)?;
     app::run(config)
 }
 

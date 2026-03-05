@@ -14,9 +14,5 @@ fn help_output_includes_core_flags() {
         .stdout(contains("--hotkey-max-tap-ms"))
         .stdout(contains("--no-gpu"))
         .stdout(contains("--no-flash-attn"))
-        .stdout(contains("--no-auto-paste"))
-        .stdout(contains("--tool-transcribe-once"))
-        .stdout(contains("--tool-record-seconds"))
-        .stdout(contains("--tool-initial-prompt"))
-        .stdout(contains("--tool-initial-prompt-file"));
+        .stdout(contains("--no-auto-paste"));
 }

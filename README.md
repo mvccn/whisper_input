@@ -24,7 +24,6 @@ Provide fast voice input everywhere by keeping a background hotkey listener and 
 
 - macOS-focused background utility with menu bar icon
 - global hotkey (left Command tap)
-- optional non-interactive one-shot tool mode for app embedding
 - microphone capture from default input device
 - local Whisper inference via `whisper-rs` (`whisper.cpp` backend)
 - macOS Metal GPU acceleration enabled by default (`use_gpu=1`)
@@ -64,27 +63,6 @@ cargo run --release
 
 3. Use left Command to start/stop voice capture while focused in any input field.
 
-## Embedding Mode
-
-Use one-shot tool mode when embedding `whisper_input` into TUI or GUI apps:
-
-```bash
-whisper_input --tool-transcribe-once --tool-record-seconds 6
-```
-
-- Records for the requested number of seconds.
-- Prints transcript to stdout (empty line when no usable speech was detected).
-- Keeps tray/hotkey mode unchanged when `--tool-transcribe-once` is omitted.
-
-You can bias decoding with app context:
-
-```bash
-whisper_input \
-  --tool-transcribe-once \
-  --tool-initial-prompt "Codex, buildkite, memetrader" \
-  --tool-initial-prompt-file ~/.cache/whisper_input/context.txt
-```
-
 ## Tray Menu
 
 - `Start Listening` / `Stop Listening`
@@ -110,10 +88,6 @@ Options:
   --no-gpu                               Disable GPU acceleration and force CPU-only inference
   --no-flash-attn                        Disable Flash Attention in Whisper context initialization
   --no-auto-paste                        Skip Cmd+V and only copy transcript to clipboard
-  --tool-transcribe-once                 Run one non-interactive capture/transcribe pass and print transcript to stdout
-  --tool-record-seconds <SECONDS>        Capture duration in seconds for --tool-transcribe-once [default: 6]
-  --tool-initial-prompt <TEXT>           Inline initial prompt text for --tool-transcribe-once
-  --tool-initial-prompt-file <PATH>      File containing initial prompt text for --tool-transcribe-once
   -h, --help                             Print help
 ```
 
