@@ -1,24 +1,18 @@
-# whisper_input
-
-Voice input for any app, designed with agent coding in mind.
+# whisper_input: 
+Voice input for any app, designed with fitting in fast agent coding in mind.
 
 Built for `Claude`, `Codex`, `Gemini`, terminals, browsers, and any text field on macOS.
 
 ## Why
 
-We wanted voice input that keeps coding flow fast and uninterrupted.
+### Fast: TAP.. SPEAK, faster than you type
+- We wanted voice input that keeps coding flow fast and uninterrupted. This can be used anywhere/any app you can type, but the design target is agent coding: short prompts, quick edits, terminal input, and staying in flow without breaking concentration.
+- On Apple Silicon Macs, Whisper runs with Metal GPU acceleration. With the `base` or `small` model, results are typically near-instant.
 
-This can be used anywhere you can type, but the design target is agent coding: short prompts, quick edits, terminal input, and staying in flow without breaking concentration.
-
-- No subscription.
-- No usage meter.
-- No limited free minutes.
-- True open source.
-- Works offline after the model is downloaded.
-
-Products like OpenWhisper and SuperWhisper are polished, but they are subscription products. This project is simpler: install it, run it, talk, get text.
-
-On Apple Silicon Macs, Whisper runs with Metal GPU acceleration. With the `base` or `small` model, results are typically near-instant.
+### Free
+the project started by using some "open" software and after some free usage, found they charge subscriptions. this one is: 
+- 100% free, no free minutes, subscriptions. most of "open" product are not free.
+- 100% open-sourced 
 
 ## Install
 
@@ -39,7 +33,7 @@ Install as a menu bar app:
 ./scripts/install_macos_app.sh
 ```
 
-On first run, macOS will ask for:
+On first run, macOS will ask for permissions:
 
 - Microphone
 - Accessibility
@@ -49,10 +43,10 @@ On first run, macOS will ask for:
 
 Default flow:
 
-1. Tap Right Command once to start listening.
+1. Tap hotkey(default).
 2. Speak.
-3. Tap Right Command again to stop.
-4. The app transcribes locally, copies the text, and pastes it into the current app.
+3. Tap hotkey again, and the input should show instantly. It is also copied to clipboard.  
+4. try to type and speak at the same time, have fun!
 
 You can change the hotkey and model from `Settings...` in the tray menu.
 
@@ -64,6 +58,7 @@ You can change the hotkey and model from `Settings...` in the tray menu.
 - Listening state shows a red tray animation
 - Processing stays visible in the tray while transcription runs
 
-## Project Goal
-
-Make voice input fit naturally into a fast, non-interrupting coding workflow, especially for agent-driven work.
+## Future plan: 
+ 
+- tune whiper for complicated code and command
+- voice TTS
