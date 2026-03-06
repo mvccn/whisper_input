@@ -6,7 +6,9 @@ mod config;
 mod hotkey;
 mod model;
 mod paste;
+mod settings_window;
 mod sound;
+mod startup;
 mod transcribe;
 
 use anyhow::Result;
@@ -19,6 +21,10 @@ fn main() -> Result<()> {
     init_logging();
     let cli = Cli::parse();
     let config = Config::from_cli(cli)?;
+    let Some(_instance_guard) = startup::acquire_single_instance()? else {
+        return Ok(());
+    };
+    startup::run_startup_checks();
     app::run(config)
 }
 

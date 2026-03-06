@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Result, bail};
 use clap::Parser;
 
+use crate::hotkey::CommandKeySide;
 use crate::model::{self, ModelSize};
 
 /// CLI arguments for the whisper_input binary.
@@ -39,7 +40,16 @@ pub(crate) struct Cli {
     #[arg(long, default_value_t = 45)]
     pub(crate) max_record_seconds: u64,
 
-    /// Maximum press duration in milliseconds for a left-command tap.
+    /// Command-key side used to toggle recording.
+    #[arg(
+        long,
+        env = "WHISPER_COMMAND_KEY",
+        value_enum,
+        default_value_t = CommandKeySide::Right
+    )]
+    pub(crate) command_key: CommandKeySide,
+
+    /// Maximum press duration in milliseconds for a command-key tap.
     #[arg(long, default_value_t = 450)]
     pub(crate) hotkey_max_tap_ms: u64,
 
@@ -63,6 +73,7 @@ pub(crate) struct Config {
     pub(crate) model_dir: PathBuf,
     pub(crate) threads: i32,
     pub(crate) max_record_seconds: u64,
+    pub(crate) command_key: CommandKeySide,
     pub(crate) hotkey_max_tap_ms: u64,
     pub(crate) use_gpu: bool,
     pub(crate) flash_attn: bool,
@@ -93,6 +104,7 @@ impl Config {
             model_dir: cli.model_dir,
             threads,
             max_record_seconds: cli.max_record_seconds,
+            command_key: cli.command_key,
             hotkey_max_tap_ms: cli.hotkey_max_tap_ms,
             use_gpu: !cli.no_gpu,
             flash_attn: !cli.no_flash_attn,
@@ -121,6 +133,7 @@ fn normalize_threads(input: Option<usize>) -> Result<i32> {
 #[cfg(test)]
 mod tests {
     use super::{Cli, Config, normalize_threads};
+    use crate::hotkey::CommandKeySide;
     use crate::model::ModelSize;
     use clap::Parser;
 
@@ -146,6 +159,7 @@ mod tests {
     fn cli_default_model_size_is_base() {
         let cli = Cli::parse_from(["whisper_input"]);
         assert_eq!(cli.model_size, ModelSize::Base);
+        assert_eq!(cli.command_key, CommandKeySide::Right);
     }
 
     #[test]
@@ -159,6 +173,7 @@ mod tests {
             std::path::PathBuf::from("/tmp/whisper_models")
         );
         assert_eq!(config.threads, 2);
+        assert_eq!(config.command_key, CommandKeySide::Right);
         assert!(config.use_gpu);
         assert!(config.flash_attn);
         assert!(config.auto_paste);
@@ -179,5 +194,20 @@ mod tests {
 
         assert!(!config.use_gpu);
         assert!(!config.flash_attn);
+    }
+
+    #[test]
+    fn from_cli_supports_right_command_key() {
+        let cli = Cli::parse_from([
+            "whisper_input",
+            "--model-size",
+            "small",
+            "--model-dir",
+            "/tmp/whisper_models",
+            "--command-key",
+            "right",
+        ]);
+        let config = Config::from_cli(cli).expect("cli should parse");
+        assert_eq!(config.command_key, CommandKeySide::Right);
     }
 }

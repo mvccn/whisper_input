@@ -29,7 +29,7 @@ pub(crate) fn play(cue: SoundCue) {
 /// Maps a cue to a built-in macOS system sound asset.
 fn system_sound_path(cue: SoundCue) -> &'static str {
     match cue {
-        SoundCue::ListeningStarted => "/System/Library/Sounds/Pop.aiff",
+        SoundCue::ListeningStarted => "/System/Library/Sounds/Hero.aiff",
         SoundCue::ListeningStopped => "/System/Library/Sounds/Glass.aiff",
     }
 }
@@ -42,7 +42,7 @@ mod tests {
     fn listening_started_has_distinct_sound() {
         assert_eq!(
             system_sound_path(SoundCue::ListeningStarted),
-            "/System/Library/Sounds/Pop.aiff"
+            "/System/Library/Sounds/Hero.aiff"
         );
     }
 

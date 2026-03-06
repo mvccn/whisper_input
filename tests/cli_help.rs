@@ -11,6 +11,7 @@ fn help_output_includes_core_flags() {
         .success()
         .stdout(contains("--model-size"))
         .stdout(contains("--model-dir"))
+        .stdout(contains("--command-key"))
         .stdout(contains("--hotkey-max-tap-ms"))
         .stdout(contains("--no-gpu"))
         .stdout(contains("--no-flash-attn"))
