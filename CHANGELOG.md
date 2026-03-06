@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Switched the tray's listening animation from the default template waveform to a red pulse, while keeping the other tray states as template icons.
+- Rewrote the README into a shorter install-and-use guide focused on local agent-coding voice input, free/open-source positioning, and Apple Silicon performance.
 
 ## [0.3.17] - 2026-03-06
 
